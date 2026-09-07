@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
+from app.modules.ai.router import router as ai_router
 from app.modules.attraction.router import router as attraction_router
 from app.modules.favorite.router import router as favorite_router
 from app.modules.food.router import router as food_router
@@ -26,6 +27,7 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.include_router(food_router, prefix="/api")
 app.include_router(attraction_router, prefix="/api")
 app.include_router(favorite_router, prefix="/api")
+app.include_router(ai_router, prefix="/api")
 
 
 @app.get("/api/health")
