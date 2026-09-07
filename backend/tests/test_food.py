@@ -72,3 +72,19 @@ def test_list_foods_empty(client, db_session):
 def test_list_foods_invalid_page(client, db_session):
     resp = client.get("/api/foods", params={"page": 0})
     assert resp.status_code == 422
+
+
+def test_list_foods_sort_by_rating(client, db_session):
+    f1 = Food(name="高分菜", description="测试", avg_price=10.0, rating=4.9, rating_count=100)
+    f2 = Food(name="低分菜", description="测试", avg_price=10.0, rating=4.0, rating_count=50)
+    db_session.add_all([f1, f2])
+    db_session.commit()
+    resp = client.get("/api/foods", params={"sort": "rating"})
+    data = resp.json()
+    assert data["items"][0]["name"] == "高分菜"
+    assert data["items"][1]["name"] == "低分菜"
+
+
+def test_list_foods_invalid_sort(client, db_session):
+    resp = client.get("/api/foods", params={"sort": "foo"})
+    assert resp.status_code == 422

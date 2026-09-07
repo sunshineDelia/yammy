@@ -13,14 +13,15 @@ class AttractionRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def list(self, page: int, page_size: int, keyword: str | None = None) -> tuple[list[Attraction], int]:
+    def list(self, page: int, page_size: int, keyword: str | None = None, sort: str = "id") -> tuple[list[Attraction], int]:
         stmt = select(Attraction)
         if keyword:
             stmt = _keyword_filter(stmt, keyword)
         total = self.db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+        order_by = (Attraction.rating.desc(), Attraction.rating_count.desc(), Attraction.id) if sort == "rating" else (Attraction.id,)
         items = list(
             self.db.scalars(
-                stmt.order_by(Attraction.id).offset((page - 1) * page_size).limit(page_size)
+                stmt.order_by(*order_by).offset((page - 1) * page_size).limit(page_size)
             )
         )
         return items, total

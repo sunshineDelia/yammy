@@ -13,15 +13,16 @@ class FoodRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def list(self, page: int, page_size: int, keyword: str | None = None) -> tuple[list[Food], int]:
+    def list(self, page: int, page_size: int, keyword: str | None = None, sort: str = "id") -> tuple[list[Food], int]:
         stmt = select(Food)
         if keyword:
             stmt = _keyword_filter(stmt, keyword)
         total = self.db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+        order_by = (Food.rating.desc(), Food.rating_count.desc(), Food.id) if sort == "rating" else (Food.id,)
         items = list(
             self.db.scalars(
                 stmt.options(selectinload(Food.stores))
-                .order_by(Food.id)
+                .order_by(*order_by)
                 .offset((page - 1) * page_size)
                 .limit(page_size)
             )

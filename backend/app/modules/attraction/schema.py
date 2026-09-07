@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class AttractionBrief(BaseModel):
@@ -7,6 +7,8 @@ class AttractionBrief(BaseModel):
     id: int
     name: str
     ticket_price: str
+    rating: float
+    level: str
     image_url: str | None = None
 
 
@@ -18,6 +20,12 @@ class AttractionOut(BaseModel):
     description: str
     open_time: str
     ticket_price: str
+    rating: float
+    rating_count: int
+    level: str
+    duration: str
+    address: str | None = None
+    tags: list[str] = Field(default_factory=list)
     image_url: str | None = None
 
 

@@ -6,8 +6,8 @@ class AttractionService:
     def __init__(self, repo: AttractionRepository):
         self.repo = repo
 
-    def list_attractions(self, page: int, page_size: int, keyword: str | None = None) -> AttractionListOut:
-        items, total = self.repo.list(page, page_size, keyword)
+    def list_attractions(self, page: int, page_size: int, keyword: str | None = None, sort: str = "id") -> AttractionListOut:
+        items, total = self.repo.list(page, page_size, keyword, sort)
         return AttractionListOut(
             items=[AttractionOut.model_validate(a) for a in items],
             total=total,

@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -14,9 +16,10 @@ def list_foods(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     keyword: str | None = None,
+    sort: Literal["id", "rating"] = "id",
     db: Session = Depends(get_db),
 ):
-    return FoodService(FoodRepository(db)).list_foods(page, page_size, keyword)
+    return FoodService(FoodRepository(db)).list_foods(page, page_size, keyword, sort)
 
 
 @router.get("/{food_id}", response_model=FoodOut)

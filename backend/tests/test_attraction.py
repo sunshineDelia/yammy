@@ -67,3 +67,19 @@ def test_list_attractions_empty(client, db_session):
 def test_list_attractions_invalid_page(client, db_session):
     resp = client.get("/api/attractions", params={"page": 0})
     assert resp.status_code == 422
+
+
+def test_list_attractions_sort_by_rating(client, db_session):
+    a1 = Attraction(name="高分景点", description="测试", open_time="全天", ticket_price="免费", rating=4.8, rating_count=200)
+    a2 = Attraction(name="低分景点", description="测试", open_time="全天", ticket_price="免费", rating=4.0, rating_count=50)
+    db_session.add_all([a1, a2])
+    db_session.commit()
+    resp = client.get("/api/attractions", params={"sort": "rating"})
+    data = resp.json()
+    assert data["items"][0]["name"] == "高分景点"
+    assert data["items"][1]["name"] == "低分景点"
+
+
+def test_list_attractions_invalid_sort(client, db_session):
+    resp = client.get("/api/attractions", params={"sort": "foo"})
+    assert resp.status_code == 422

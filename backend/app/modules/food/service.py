@@ -6,8 +6,8 @@ class FoodService:
     def __init__(self, repo: FoodRepository):
         self.repo = repo
 
-    def list_foods(self, page: int, page_size: int, keyword: str | None = None) -> FoodListOut:
-        items, total = self.repo.list(page, page_size, keyword)
+    def list_foods(self, page: int, page_size: int, keyword: str | None = None, sort: str = "id") -> FoodListOut:
+        items, total = self.repo.list(page, page_size, keyword, sort)
         return FoodListOut(
             items=[FoodOut.model_validate(f) for f in items],
             total=total,

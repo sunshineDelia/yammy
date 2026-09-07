@@ -15,6 +15,8 @@ class FoodBrief(BaseModel):
     id: int
     name: str
     avg_price: float
+    rating: float
+    category: str
     image_url: str | None = None
 
 
@@ -25,6 +27,11 @@ class FoodOut(BaseModel):
     name: str
     description: str
     avg_price: float
+    rating: float
+    rating_count: int
+    category: str
+    tags: list[str] = Field(default_factory=list)
+    address: str | None = None
     image_url: str | None = None
     stores: list[StoreOut] = Field(default_factory=list)
 
