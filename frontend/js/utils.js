@@ -12,6 +12,11 @@ function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+function renderStars(rating) {
+  const full = Math.round(rating);
+  return `<span class="stars">${"★".repeat(full)}${"☆".repeat(5 - full)}</span>`;
+}
+
 function showToast(msg) {
   let t = document.getElementById("toast");
   if (!t) {

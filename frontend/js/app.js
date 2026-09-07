@@ -1,6 +1,7 @@
 const routes = {
   foods: () => FoodView.list(),
   attractions: () => AttractionView.list(),
+  ranking: () => RankingView.render(),
   ai: () => AIView.render(),
   favorites: () => FavoriteView.list(),
 };
@@ -8,13 +9,34 @@ const routes = {
 function renderHome() {
   const view = document.getElementById("view");
   view.innerHTML = `
-    <div class="detail">
-      <h2>欢迎来到南昌</h2>
-      <p>探索南昌特色美食与旅游景点，还能用 AI 帮你规划游玩攻略。</p>
-      <div class="card-grid" style="margin-top:16px">
-        <div class="card"><div class="card-body"><h3>🍜 美食</h3><p class="desc">南昌拌粉、瓦罐汤、藜蒿炒腊肉……</p></div></div>
-        <div class="card"><div class="card-body"><h3>🏞️ 景点</h3><p class="desc">滕王阁、八一广场、绳金塔……</p></div></div>
-        <div class="card"><div class="card-body"><h3>🤖 AI 攻略</h3><p class="desc">输入问题，一键生成南昌游玩攻略。</p></div></div>
+    <div class="hero">
+      <h1>探索南昌 · 寻味赣鄱</h1>
+      <p>60+ 特色美食 · 60+ 旅游景点 · AI 智能攻略，一站式规划你的南昌之旅</p>
+    </div>
+    <div class="card-grid">
+      <div class="card" style="cursor:pointer" onclick="location.hash='#/foods'">
+        <div class="card-body">
+          <h3>🍜 特色美食</h3>
+          <p class="desc">南昌拌粉、瓦罐汤、藜蒿炒腊肉…… 60+ 道地道风味</p>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="location.hash='#/attractions'">
+        <div class="card-body">
+          <h3>🏞️ 旅游景点</h3>
+          <p class="desc">滕王阁、海昏侯、梅岭…… 60+ 处游玩好去处</p>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="location.hash='#/ranking'">
+        <div class="card-body">
+          <h3>🏆 好评榜</h3>
+          <p class="desc">按真实评分排行的美食/景点榜单，帮你快速做选择</p>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="location.hash='#/ai'">
+        <div class="card-body">
+          <h3>🤖 AI 攻略</h3>
+          <p class="desc">输入问题，一键生成专属南昌游玩攻略</p>
+        </div>
       </div>
     </div>`;
 }
@@ -29,7 +51,7 @@ function router() {
   const hash = location.hash || "#/";
   const view = document.getElementById("view");
   if (hash === "#/" || hash === "#/home") {
-    setActiveNav("");
+    setActiveNav("home");
     return renderHome();
   }
   const parts = hash.slice(2).split("/").filter(Boolean);
