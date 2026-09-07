@@ -15,19 +15,23 @@ class ContextBuilder:
     def retrieve(self, question: str) -> dict:
         foods = [f for f in self.food_repo.list_all() if f.name and f.name in question]
         attractions = [a for a in self.attraction_repo.list_all() if a.name and a.name in question]
-        if not foods and not attractions:
+        if not foods:
             foods = self.food_repo.search(question, limit=5)
+        if not attractions:
             attractions = self.attraction_repo.search(question, limit=5)
         return {"foods": foods[:5], "attractions": attractions[:5]}
 
     def _format_context(self, context: dict) -> str:
-        lines = ["以下为南昌本地数据：", "【美食】"]
-        for f in context["foods"]:
-            stores = "、".join(s.name for s in f.stores)
-            lines.append(f"- {f.name}：人均 {f.avg_price} 元；{f.description}；推荐门店：{stores}")
-        lines.append("【景点】")
-        for a in context["attractions"]:
-            lines.append(f"- {a.name}：开放时间 {a.open_time}；门票 {a.ticket_price}；{a.description}")
+        lines = ["以下为南昌本地数据："]
+        if context["foods"]:
+            lines.append("【美食】")
+            for f in context["foods"]:
+                stores = "、".join(s.name for s in f.stores)
+                lines.append(f"- {f.name}：人均 {f.avg_price} 元；{f.description}；推荐门店：{stores}")
+        if context["attractions"]:
+            lines.append("【景点】")
+            for a in context["attractions"]:
+                lines.append(f"- {a.name}：开放时间 {a.open_time}；门票 {a.ticket_price}；{a.description}")
         return "\n".join(lines)
 
     def build_messages(self, question: str, context: dict) -> list[dict]:

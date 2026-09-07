@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_db
 from app.modules.ai.context_builder import ContextBuilder
-from app.modules.ai.deepseek_client import DeepSeekClient
+from app.modules.ai.deepseek_client import DeepSeekClient, DeepSeekError
 from app.modules.ai.schema import ConsultRequest, ConsultResponse
 from app.modules.ai.service import AIService
 from app.modules.attraction.repository import AttractionRepository
@@ -20,5 +20,5 @@ def consult(payload: ConsultRequest, db: Session = Depends(get_db)):
     )
     try:
         return service.consult(payload.question)
-    except Exception:
+    except DeepSeekError:
         raise HTTPException(status_code=502, detail="AI 服务调用失败")

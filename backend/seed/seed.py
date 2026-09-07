@@ -2,7 +2,9 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from sqlalchemy import func, select
 
 from app.core.database import Base, SessionLocal, engine
 from app.modules.attraction.model import Attraction
@@ -13,7 +15,9 @@ def seed() -> None:
     Base.metadata.create_all(engine)
     db = SessionLocal()
     try:
-        if db.query(Food).count() > 0:
+        food_count = db.scalar(select(func.count()).select_from(Food)) or 0
+        attraction_count = db.scalar(select(func.count()).select_from(Attraction)) or 0
+        if food_count > 0 or attraction_count > 0:
             print("检测到已有数据，跳过种子。")
             return
 

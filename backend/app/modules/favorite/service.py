@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from app.modules.attraction.repository import AttractionRepository
 from app.modules.attraction.schema import AttractionBrief
@@ -37,7 +38,15 @@ class FavoriteService:
         existing = self.repo.get(device_id, target_type, target_id)
         if existing is not None:
             return existing, False
-        return self.repo.add(device_id, target_type, target_id), True
+        try:
+            return self.repo.add(device_id, target_type, target_id), True
+        except IntegrityError:
+            # 并发下唯一约束兜底：另一请求已插入，回滚后按幂等返回
+            self.repo.db.rollback()
+            existing = self.repo.get(device_id, target_type, target_id)
+            if existing is not None:
+                return existing, False
+            raise
 
     def remove(self, device_id: str, target_type: str, target_id: int) -> bool:
         if target_type not in VALID_TARGET_TYPES:
@@ -51,6 +60,14 @@ class FavoriteService:
 
     def list_favorites(self, device_id: str, page: int, page_size: int) -> FavoriteListOut:
         items, total = self.repo.list(device_id, page, page_size)
+        food_ids = [f.target_id for f in items if f.target_type == "food"]
+        attraction_ids = [f.target_id for f in items if f.target_type == "attraction"]
+        foods = {
+            f.id: FoodBrief.model_validate(f) for f in self.food_repo.get_by_ids(food_ids)
+        }
+        attractions = {
+            a.id: AttractionBrief.model_validate(a) for a in self.attraction_repo.get_by_ids(attraction_ids)
+        }
         result = []
         for fav in items:
             item = FavoriteItem(
@@ -59,12 +76,8 @@ class FavoriteService:
                 created_at=fav.created_at,
             )
             if fav.target_type == "food":
-                food = self.food_repo.get_by_id(fav.target_id)
-                if food is not None:
-                    item.food = FoodBrief.model_validate(food)
+                item.food = foods.get(fav.target_id)
             elif fav.target_type == "attraction":
-                attraction = self.attraction_repo.get_by_id(fav.target_id)
-                if attraction is not None:
-                    item.attraction = AttractionBrief.model_validate(attraction)
+                item.attraction = attractions.get(fav.target_id)
             result.append(item)
         return FavoriteListOut(items=result, total=total, page=page, page_size=page_size)

@@ -43,3 +43,32 @@ def test_get_food_detail_with_stores(client, db_session):
 def test_get_food_not_found(client, db_session):
     resp = client.get("/api/foods/999")
     assert resp.status_code == 404
+
+
+def test_list_foods_search_by_description(client, db_session):
+    _seed(db_session)
+    resp = client.get("/api/foods", params={"keyword": "代表"})
+    data = resp.json()
+    assert data["total"] == 1
+    assert data["items"][0]["name"] == "南昌拌粉"
+
+
+def test_list_foods_pagination(client, db_session):
+    _seed(db_session)
+    resp = client.get("/api/foods", params={"page": 2, "page_size": 1})
+    data = resp.json()
+    assert data["total"] == 2
+    assert len(data["items"]) == 1
+    assert data["items"][0]["name"] == "瓦罐汤"
+
+
+def test_list_foods_empty(client, db_session):
+    resp = client.get("/api/foods")
+    data = resp.json()
+    assert data["total"] == 0
+    assert data["items"] == []
+
+
+def test_list_foods_invalid_page(client, db_session):
+    resp = client.get("/api/foods", params={"page": 0})
+    assert resp.status_code == 422

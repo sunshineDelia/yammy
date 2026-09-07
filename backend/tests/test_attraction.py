@@ -38,3 +38,32 @@ def test_get_attraction_detail(client, db_session):
 def test_get_attraction_not_found(client, db_session):
     resp = client.get("/api/attractions/999")
     assert resp.status_code == 404
+
+
+def test_list_attractions_search_by_description(client, db_session):
+    _seed(db_session)
+    resp = client.get("/api/attractions", params={"keyword": "名楼"})
+    data = resp.json()
+    assert data["total"] == 1
+    assert data["items"][0]["name"] == "滕王阁"
+
+
+def test_list_attractions_pagination(client, db_session):
+    _seed(db_session)
+    resp = client.get("/api/attractions", params={"page": 2, "page_size": 1})
+    data = resp.json()
+    assert data["total"] == 2
+    assert len(data["items"]) == 1
+    assert data["items"][0]["name"] == "八一广场"
+
+
+def test_list_attractions_empty(client, db_session):
+    resp = client.get("/api/attractions")
+    data = resp.json()
+    assert data["total"] == 0
+    assert data["items"] == []
+
+
+def test_list_attractions_invalid_page(client, db_session):
+    resp = client.get("/api/attractions", params={"page": 0})
+    assert resp.status_code == 422

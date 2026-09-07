@@ -4,6 +4,11 @@ from sqlalchemy.orm import Session, selectinload
 from app.modules.food.model import Food
 
 
+def _keyword_filter(stmt, keyword: str):
+    like = f"%{keyword}%"
+    return stmt.where(or_(Food.name.like(like), Food.description.like(like)))
+
+
 class FoodRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -11,8 +16,7 @@ class FoodRepository:
     def list(self, page: int, page_size: int, keyword: str | None = None) -> tuple[list[Food], int]:
         stmt = select(Food)
         if keyword:
-            like = f"%{keyword}%"
-            stmt = stmt.where(or_(Food.name.like(like), Food.description.like(like)))
+            stmt = _keyword_filter(stmt, keyword)
         total = self.db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
         items = list(
             self.db.scalars(
@@ -29,14 +33,17 @@ class FoodRepository:
         return self.db.scalar(stmt)
 
     def list_all(self) -> list[Food]:
-        return list(self.db.scalars(select(Food).options(selectinload(Food.stores))))
+        return list(self.db.scalars(select(Food).options(selectinload(Food.stores)).order_by(Food.id)))
 
     def search(self, keyword: str, limit: int = 5) -> list[Food]:
-        like = f"%{keyword}%"
         stmt = (
-            select(Food)
-            .options(selectinload(Food.stores))
-            .where(or_(Food.name.like(like), Food.description.like(like)))
+            _keyword_filter(select(Food).options(selectinload(Food.stores)), keyword)
+            .order_by(Food.id)
             .limit(limit)
         )
         return list(self.db.scalars(stmt))
+
+    def get_by_ids(self, ids: list[int]) -> list[Food]:
+        if not ids:
+            return []
+        return list(self.db.scalars(select(Food).where(Food.id.in_(ids))))

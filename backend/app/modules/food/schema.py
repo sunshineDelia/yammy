@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class StoreOut(BaseModel):
@@ -26,7 +26,7 @@ class FoodOut(BaseModel):
     description: str
     avg_price: float
     image_url: str | None = None
-    stores: list[StoreOut] = []
+    stores: list[StoreOut] = Field(default_factory=list)
 
 
 class FoodListOut(BaseModel):

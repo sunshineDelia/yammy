@@ -11,7 +11,7 @@ def get_db():
         db.close()
 
 
-def get_device_id(x_device_id: str = Header("", alias="X-Device-Id")) -> str:
+def get_device_id(x_device_id: str | None = Header(default=None, alias="X-Device-Id")) -> str:
     if not x_device_id:
         raise HTTPException(status_code=400, detail="缺少 X-Device-Id 请求头")
     return x_device_id
