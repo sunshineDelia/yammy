@@ -12,8 +12,22 @@ from app.modules.favorite.model import Favorite  # noqa: F401  确保 create_all
 from app.modules.food.model import Food, Store
 
 # 知名条目使用精确图；其余使用分类通用图（gen_food_*/gen_attr_*）
-GEN_FOOD = [f"/static/images/foods/gen_food_{i}.jpg" for i in range(1, 11)]
 GEN_ATTR = [f"/static/images/attractions/gen_attr_{i}.jpg" for i in range(1, 11)]
+
+# 通用图按美食分类对应，避免图片与菜名不匹配
+CATEGORY_IMG = {
+    "米粉": "/static/images/foods/gen_food_1.jpg",   # 米线/面食
+    "主食": "/static/images/foods/gen_food_1.jpg",   # 面食
+    "汤羹": "/static/images/foods/gen_food_2.jpg",   # 汤
+    "热菜": "/static/images/foods/gen_food_3.jpg",   # 炒菜
+    "小吃": "/static/images/foods/gen_food_6.jpg",   # 街头小吃
+    "甜点": "/static/images/foods/gen_food_5.jpg",   # 甜点
+    "饮品": "/static/images/foods/gen_food_7.jpg",   # 茶饮
+    "卤味": "/static/images/foods/gen_food_10.jpg",  # 卤制
+    "腊味": "/static/images/foods/gen_food_10.jpg",  # 腊味
+    "烧烤": "/static/images/foods/gen_food_8.jpg",   # 烧烤
+    "特产": "/static/images/foods/gen_food_9.jpg",   # 水果
+}
 
 # (name, description, avg_price, category, rating, rating_count, tags, address, image_url, stores)
 FOODS = [
@@ -155,8 +169,8 @@ def seed() -> None:
             return
 
         foods = []
-        for i, (name, desc, price, cat, rating, rc, tags, addr, img, stores) in enumerate(FOODS):
-            image_url = img or GEN_FOOD[i % len(GEN_FOOD)]
+        for (name, desc, price, cat, rating, rc, tags, addr, img, stores) in FOODS:
+            image_url = img or CATEGORY_IMG.get(cat, "/static/images/foods/gen_food_1.jpg")
             foods.append(Food(
                 name=name, description=desc, avg_price=price, rating=rating,
                 rating_count=rc, category=cat, tags=tags, address=addr,
