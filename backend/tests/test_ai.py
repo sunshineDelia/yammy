@@ -54,6 +54,18 @@ def test_consult_generic_question_falls_back_to_top(client, db_session):
     assert len(resp.json()["references"]["foods"]) == 2
 
 
+def test_consult_specific_question_no_overfill(client, db_session):
+    from app.modules.attraction.model import Attraction
+    _seed(db_session)
+    db_session.add(Attraction(name="滕王阁", description="名楼", open_time="全天", ticket_price="免费", rating=4.9))
+    db_session.commit()
+    with patch.object(DeepSeekClient, "chat", return_value="ok"):
+        resp = client.post("/api/ai/consult", json={"question": "南昌拌粉怎么样"})
+    d = resp.json()
+    assert d["references"]["foods"][0]["name"] == "南昌拌粉"
+    assert d["references"]["attractions"] == []
+
+
 def test_consult_empty_references(client, db_session):
     with patch.object(DeepSeekClient, "chat", return_value="ok"):
         resp = client.post("/api/ai/consult", json={"question": "随便聊聊"})

@@ -15,10 +15,9 @@ class ContextBuilder:
     def retrieve(self, question: str) -> dict:
         foods = [f for f in self.food_repo.list_all() if f.name and f.name in question]
         attractions = [a for a in self.attraction_repo.list_all() if a.name and a.name in question]
-        # 兜底：关键词 LIKE 匹配；仍无结果则取 Top 5，保证泛化问题也有本地上下文与相关推荐
-        if not foods:
+        # 仅在未命中任何具体实体时（泛化问题）才兜底，避免给具体问题强塞无关推荐
+        if not foods and not attractions:
             foods = self.food_repo.search(question, limit=5) or self.food_repo.list_all()[:5]
-        if not attractions:
             attractions = self.attraction_repo.search(question, limit=5) or self.attraction_repo.list_all()[:5]
         return {"foods": foods[:5], "attractions": attractions[:5]}
 
