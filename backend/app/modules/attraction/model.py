@@ -4,12 +4,13 @@ from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
+from app.core.types import BigIntType
 
 
 class Attraction(Base):
     __tablename__ = "attraction"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(BigIntType, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     open_time: Mapped[str] = mapped_column(String(100), nullable=False)
