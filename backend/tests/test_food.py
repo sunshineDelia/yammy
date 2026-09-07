@@ -1,0 +1,45 @@
+from app.modules.food.model import Food, Store
+
+
+def _seed(db):
+    f1 = Food(name="南昌拌粉", description="南昌最具代表性的小吃", avg_price=12.0)
+    f1.stores = [Store(name="黄记拌粉", address="中山路1号")]
+    f2 = Food(name="瓦罐汤", description="南昌传统煨汤", avg_price=20.0)
+    db.add_all([f1, f2])
+    db.commit()
+    for f in (f1, f2):
+        db.refresh(f)
+    return f1, f2
+
+
+def test_list_foods(client, db_session):
+    _seed(db_session)
+    resp = client.get("/api/foods")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total"] == 2
+    assert len(data["items"]) == 2
+    assert data["page"] == 1
+    assert data["page_size"] == 10
+
+
+def test_list_foods_search(client, db_session):
+    _seed(db_session)
+    resp = client.get("/api/foods", params={"keyword": "瓦罐"})
+    data = resp.json()
+    assert data["total"] == 1
+    assert data["items"][0]["name"] == "瓦罐汤"
+
+
+def test_get_food_detail_with_stores(client, db_session):
+    f1, _ = _seed(db_session)
+    resp = client.get(f"/api/foods/{f1.id}")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["name"] == "南昌拌粉"
+    assert data["stores"][0]["name"] == "黄记拌粉"
+
+
+def test_get_food_not_found(client, db_session):
+    resp = client.get("/api/foods/999")
+    assert resp.status_code == 404

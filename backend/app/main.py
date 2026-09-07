@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.core.config import settings
+from app.modules.food.router import router as food_router
 
 app = FastAPI(title=settings.app_name)
 
@@ -19,6 +20,8 @@ app.add_middleware(
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+app.include_router(food_router, prefix="/api")
 
 
 @app.get("/api/health")
