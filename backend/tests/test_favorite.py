@@ -71,3 +71,13 @@ def test_status(client, db_session):
     f = _seed_food(db_session)
     resp = client.get("/api/favorites/status", params={"target_type": "food", "target_id": f.id}, headers={"X-Device-Id": "dev1"})
     assert resp.json() == {"favorited": False}
+
+
+def test_delete_invalid_type(client, db_session):
+    resp = client.delete("/api/favorites/foo/1", headers={"X-Device-Id": "dev1"})
+    assert resp.status_code == 400
+
+
+def test_status_invalid_type(client, db_session):
+    resp = client.get("/api/favorites/status", params={"target_type": "foo", "target_id": 1}, headers={"X-Device-Id": "dev1"})
+    assert resp.status_code == 400

@@ -40,9 +40,13 @@ class FavoriteService:
         return self.repo.add(device_id, target_type, target_id), True
 
     def remove(self, device_id: str, target_type: str, target_id: int) -> bool:
+        if target_type not in VALID_TARGET_TYPES:
+            raise HTTPException(status_code=400, detail="target_type 非法")
         return self.repo.delete(device_id, target_type, target_id)
 
     def status(self, device_id: str, target_type: str, target_id: int) -> FavoriteStatus:
+        if target_type not in VALID_TARGET_TYPES:
+            raise HTTPException(status_code=400, detail="target_type 非法")
         return FavoriteStatus(favorited=self.repo.get(device_id, target_type, target_id) is not None)
 
     def list_favorites(self, device_id: str, page: int, page_size: int) -> FavoriteListOut:
