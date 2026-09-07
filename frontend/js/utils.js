@@ -13,3 +13,7 @@ function el(html) {
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}

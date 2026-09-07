@@ -5,6 +5,20 @@ const FavoriteView = {
     return this._cache[type] && this._cache[type].has(String(id));
   },
 
+  async sync() {
+    try {
+      const data = await api.get("/favorites?page=1&page_size=100");
+      this._cache.food = new Set();
+      this._cache.attraction = new Set();
+      (data.items || []).forEach((it) => {
+        const type = it.food ? "food" : "attraction";
+        this._cache[type].add(String(it.target_id));
+      });
+    } catch (e) {
+      // 同步失败时保留现有缓存，不阻断页面渲染
+    }
+  },
+
   async toggle(type, id, btn) {
     const key = type === "food" ? "food" : "attraction";
     try {
@@ -25,8 +39,15 @@ const FavoriteView = {
   async list() {
     const view = document.getElementById("view");
     view.innerHTML = `<div class="card-grid" id="fav-grid"><div class="loading">加载中…</div></div>`;
-    const data = await api.get("/favorites?page=1&page_size=100");
     const grid = document.getElementById("fav-grid");
+    await FavoriteView.sync();
+    let data;
+    try {
+      data = await api.get("/favorites?page=1&page_size=100");
+    } catch (e) {
+      grid.innerHTML = `<div class="empty">加载失败：${escapeHtml(e.message)}</div>`;
+      return;
+    }
     if (data.items.length === 0) {
       grid.innerHTML = `<div class="empty">暂无收藏</div>`;
       return;
@@ -37,8 +58,8 @@ const FavoriteView = {
       return `
         <div class="card">
           <div class="card-body">
-            <h3>${obj.name}</h3>
-            <div class="meta">${isFood ? "人均 ¥" + obj.avg_price : obj.ticket_price}</div>
+            <h3>${escapeHtml(obj.name)}</h3>
+            <div class="meta">${isFood ? "人均 ¥" + escapeHtml(obj.avg_price) : escapeHtml(obj.ticket_price)}</div>
             <div class="actions">
               <button class="btn" onclick="location.hash='#/${isFood ? "foods" : "attractions"}/${obj.id}'">查看</button>
               <button class="btn faved" onclick="FavoriteView.toggle('${isFood ? "food" : "attraction"}', ${obj.id}, this)">取消收藏</button>
