@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = "/api";
 
 async function request(method, path, body) {
   const headers = { "X-Device-Id": getDeviceId() };

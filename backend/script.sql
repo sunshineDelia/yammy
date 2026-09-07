@@ -4,8 +4,9 @@
 -- 数据库名 : nanchang_travel
 -- 表        : food(美食) / store(推荐门店) / attraction(景点) / favorite(收藏)
 -- 引擎/字符集: InnoDB / utf8mb4
--- 兼容性    : MySQL 5.7+ / 8.0
+-- 兼容性    : MySQL 5.7+ / 8.0（tags 使用 JSON 类型，需 5.7+）
 -- 运行方式  : mysql -u root -p < backend/script.sql
+-- 说明      : 本脚本仅建库建表；数据请通过 backend/seed/seed.py 写入
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -31,13 +32,18 @@ DROP TABLE IF EXISTS `food`;
 
 -- 3.1 美食表
 CREATE TABLE `food` (
-  `id`          BIGINT         NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name`        VARCHAR(100)   NOT NULL                COMMENT '美食名称',
-  `description` TEXT           NOT NULL                COMMENT '简介',
-  `avg_price`   DECIMAL(10, 2) NOT NULL                COMMENT '人均消费（元）',
-  `image_url`   VARCHAR(255)            DEFAULT NULL   COMMENT '图片相对路径（静态资源）',
-  `created_at`  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at`  DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id`           BIGINT         NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `name`         VARCHAR(100)   NOT NULL                COMMENT '美食名称',
+  `description`  TEXT           NOT NULL                COMMENT '简介',
+  `avg_price`    DECIMAL(10, 2) NOT NULL                COMMENT '人均消费（元）',
+  `rating`       FLOAT          NOT NULL DEFAULT 0      COMMENT '评分（0-5）',
+  `rating_count` INT            NOT NULL DEFAULT 0      COMMENT '评价数',
+  `category`     VARCHAR(50)    NOT NULL DEFAULT ''     COMMENT '分类',
+  `tags`         JSON           NOT NULL                COMMENT '标签数组',
+  `address`      VARCHAR(255)            DEFAULT NULL   COMMENT '推荐商圈/地址',
+  `image_url`    VARCHAR(255)            DEFAULT NULL   COMMENT '图片相对路径',
+  `created_at`   DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updated_at`   DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -67,8 +73,14 @@ CREATE TABLE `attraction` (
   `name`         VARCHAR(100) NOT NULL                COMMENT '景点名称',
   `description`  TEXT         NOT NULL                COMMENT '简介',
   `open_time`    VARCHAR(100) NOT NULL                COMMENT '开放时间',
-  `ticket_price` VARCHAR(100) NOT NULL                COMMENT '门票参考（文本，支持「免费」「淡季/旺季」等）',
-  `image_url`    VARCHAR(255)          DEFAULT NULL   COMMENT '图片相对路径（静态资源）',
+  `ticket_price` VARCHAR(100) NOT NULL                COMMENT '门票参考（文本）',
+  `rating`       FLOAT        NOT NULL DEFAULT 0      COMMENT '评分（0-5）',
+  `rating_count` INT          NOT NULL DEFAULT 0      COMMENT '评价数',
+  `level`        VARCHAR(20)  NOT NULL DEFAULT ''     COMMENT '景区等级（AAAAA/AAAA/...）',
+  `duration`     VARCHAR(50)  NOT NULL DEFAULT ''     COMMENT '建议游玩时长',
+  `address`      VARCHAR(255)          DEFAULT NULL   COMMENT '地址',
+  `tags`         JSON         NOT NULL                COMMENT '标签数组',
+  `image_url`    VARCHAR(255)          DEFAULT NULL   COMMENT '图片相对路径',
   `created_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)

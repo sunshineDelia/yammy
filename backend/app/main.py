@@ -33,3 +33,8 @@ app.include_router(ai_router, prefix="/api")
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+# 前端静态资源：最后挂载，避免遮蔽 /api 与 /static 路由
+FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
+app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
