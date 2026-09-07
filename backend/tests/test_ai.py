@@ -43,6 +43,17 @@ def test_consult_fallback_search(client, db_session):
     assert resp.json()["references"]["foods"][0]["name"] == "南昌拌粉"
 
 
+def test_consult_generic_question_falls_back_to_top(client, db_session):
+    f1 = Food(name="南昌拌粉", description="南昌特色小吃", avg_price=12.0)
+    f2 = Food(name="瓦罐汤", description="南昌传统煨汤", avg_price=20.0)
+    db_session.add_all([f1, f2])
+    db_session.commit()
+    with patch.object(DeepSeekClient, "chat", return_value="ok"):
+        resp = client.post("/api/ai/consult", json={"question": "随便聊聊"})
+    assert resp.status_code == 200
+    assert len(resp.json()["references"]["foods"]) == 2
+
+
 def test_consult_empty_references(client, db_session):
     with patch.object(DeepSeekClient, "chat", return_value="ok"):
         resp = client.post("/api/ai/consult", json={"question": "随便聊聊"})

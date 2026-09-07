@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 
 from app.core.database import Base, SessionLocal, engine
 from app.modules.attraction.model import Attraction
+from app.modules.favorite.model import Favorite  # noqa: F401  确保 create_all 创建 favorite 表
 from app.modules.food.model import Food, Store
 
 
