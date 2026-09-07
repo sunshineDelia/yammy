@@ -14,7 +14,9 @@ const AIView = {
   async ask() {
     const q = document.getElementById("ai-question").value.trim();
     const box = document.getElementById("ai-answer");
+    const btn = document.getElementById("ai-ask");
     if (!q) { box.innerHTML = `<div class="empty">请输入问题</div>`; return; }
+    btn.disabled = true;
     box.innerHTML = `<div class="loading">正在思考…</div>`;
     try {
       const data = await api.post("/ai/consult", { question: q });
@@ -25,6 +27,8 @@ const AIView = {
       box.innerHTML = `<div class="chat-answer">${escapeHtml(data.answer)}</div>${refs ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">相关推荐：${refs}</div>` : ""}`;
     } catch (e) {
       box.innerHTML = `<div class="empty">加载失败：${escapeHtml(e.message)}</div>`;
+    } finally {
+      btn.disabled = false;
     }
   },
 };

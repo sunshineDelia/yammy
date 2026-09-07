@@ -11,6 +11,9 @@ const AttractionView = {
     await FavoriteView.sync();
     await this._load(1);
     document.getElementById("att-search").onclick = () => this._load(1, document.getElementById("att-kw").value);
+    document.getElementById("att-kw").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this._load(1, e.target.value);
+    });
   },
 
   async _load(page, keyword = "") {

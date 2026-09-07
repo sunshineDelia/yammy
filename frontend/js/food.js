@@ -11,6 +11,9 @@ const FoodView = {
     await FavoriteView.sync();
     await this._load(1);
     document.getElementById("food-search").onclick = () => this._load(1, document.getElementById("food-kw").value);
+    document.getElementById("food-kw").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") this._load(1, e.target.value);
+    });
   },
 
   async _load(page, keyword = "") {
