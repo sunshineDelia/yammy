@@ -3,11 +3,16 @@ const API_BASE = "http://localhost:8000/api";
 async function request(method, path, body) {
   const headers = { "X-Device-Id": getDeviceId() };
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  const resp = await fetch(API_BASE + path, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let resp;
+  try {
+    resp = await fetch(API_BASE + path, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) {
+    throw new Error("无法连接到服务器，请确认后端已启动");
+  }
   if (resp.status === 204) return null;
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw new Error(data.detail || "请求失败");

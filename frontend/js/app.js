@@ -28,16 +28,21 @@ function setActiveNav(view) {
 function router() {
   const hash = location.hash || "#/";
   const view = document.getElementById("view");
-  setActiveNav("");
-  if (hash === "#/" || hash === "#/home") return renderHome();
-  const [name, id] = hash.slice(2).split("/");
-  if (name === "foods" && id) return FoodView.detail(id);
-  if (name === "attractions" && id) return AttractionView.detail(id);
+  if (hash === "#/" || hash === "#/home") {
+    setActiveNav("");
+    return renderHome();
+  }
+  const parts = hash.slice(2).split("/").filter(Boolean);
+  const name = parts[0];
+  const id = parts[1];
+  if (name === "foods" && id) { setActiveNav("foods"); return FoodView.detail(id); }
+  if (name === "attractions" && id) { setActiveNav("attractions"); return AttractionView.detail(id); }
   const handler = routes[name];
   if (handler) {
     setActiveNav(name);
     handler();
   } else {
+    setActiveNav("");
     view.innerHTML = `<div class="empty">页面不存在</div>`;
   }
 }

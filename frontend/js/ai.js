@@ -19,8 +19,8 @@ const AIView = {
     try {
       const data = await api.post("/ai/consult", { question: q });
       const refs = [
-        ...data.references.foods.map((f) => `<button class="btn-gray" onclick="location.hash='#/foods/${f.id}'">🍜 ${escapeHtml(f.name)}</button>`),
-        ...data.references.attractions.map((a) => `<button class="btn-gray" onclick="location.hash='#/attractions/${a.id}'">🏞️ ${escapeHtml(a.name)}</button>`),
+        ...(data.references?.foods || []).map((f) => `<button class="btn-gray" onclick="location.hash='#/foods/${f.id}'">🍜 ${escapeHtml(f.name)}</button>`),
+        ...(data.references?.attractions || []).map((a) => `<button class="btn-gray" onclick="location.hash='#/attractions/${a.id}'">🏞️ ${escapeHtml(a.name)}</button>`),
       ].join(" ");
       box.innerHTML = `<div class="chat-answer">${escapeHtml(data.answer)}</div>${refs ? `<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">相关推荐：${refs}</div>` : ""}`;
     } catch (e) {

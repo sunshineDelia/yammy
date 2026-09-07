@@ -20,19 +20,28 @@ const FavoriteView = {
   },
 
   async toggle(type, id, btn) {
-    const key = type === "food" ? "food" : "attraction";
     try {
-      if (this.isFaved(key, id)) {
+      if (this.isFaved(type, id)) {
         await api.del(`/favorites/${type}/${id}`);
-        this._cache[key].delete(String(id));
+        this._cache[type].delete(String(id));
         if (btn) { btn.textContent = "收藏"; btn.classList.remove("faved"); }
       } else {
         await api.post("/favorites", { target_type: type, target_id: id });
-        this._cache[key].add(String(id));
+        this._cache[type].add(String(id));
         if (btn) { btn.textContent = "已收藏"; btn.classList.add("faved"); }
       }
     } catch (e) {
-      alert(e.message);
+      showToast(e.message);
+    }
+  },
+
+  async removeFromList(type, id) {
+    try {
+      await api.del(`/favorites/${type}/${id}`);
+      this._cache[type].delete(String(id));
+      await this.list();
+    } catch (e) {
+      showToast(e.message);
     }
   },
 
@@ -40,10 +49,15 @@ const FavoriteView = {
     const view = document.getElementById("view");
     view.innerHTML = `<div class="card-grid" id="fav-grid"><div class="loading">加载中…</div></div>`;
     const grid = document.getElementById("fav-grid");
-    await FavoriteView.sync();
     let data;
     try {
       data = await api.get("/favorites?page=1&page_size=100");
+      this._cache.food = new Set();
+      this._cache.attraction = new Set();
+      (data.items || []).forEach((it) => {
+        const type = it.food ? "food" : "attraction";
+        this._cache[type].add(String(it.target_id));
+      });
     } catch (e) {
       grid.innerHTML = `<div class="empty">加载失败：${escapeHtml(e.message)}</div>`;
       return;
@@ -55,6 +69,7 @@ const FavoriteView = {
     grid.innerHTML = data.items.map((it) => {
       const obj = it.food || it.attraction;
       const isFood = !!it.food;
+      const type = isFood ? "food" : "attraction";
       return `
         <div class="card">
           <div class="card-body">
@@ -62,7 +77,7 @@ const FavoriteView = {
             <div class="meta">${isFood ? "人均 ¥" + escapeHtml(obj.avg_price) : escapeHtml(obj.ticket_price)}</div>
             <div class="actions">
               <button class="btn" onclick="location.hash='#/${isFood ? "foods" : "attractions"}/${obj.id}'">查看</button>
-              <button class="btn faved" onclick="FavoriteView.toggle('${isFood ? "food" : "attraction"}', ${obj.id}, this)">取消收藏</button>
+              <button class="btn faved" onclick="FavoriteView.removeFromList('${type}', ${obj.id})">取消收藏</button>
             </div>
           </div>
         </div>`;

@@ -32,7 +32,7 @@ const FoodView = {
     }
     grid.innerHTML = data.items.map((f) => `
       <div class="card">
-        <img src="${escapeHtml(f.image_url || "")}" onerror="this.style.display='none'" alt="${escapeHtml(f.name)}">
+        ${f.image_url ? `<img src="${escapeHtml(f.image_url)}" onerror="this.style.display='none'" alt="${escapeHtml(f.name)}">` : ""}
         <div class="card-body">
           <h3>${escapeHtml(f.name)}</h3>
           <div class="meta">人均 ¥${escapeHtml(f.avg_price)}</div>
@@ -63,7 +63,7 @@ const FoodView = {
       <div class="detail">
         <h2>${escapeHtml(f.name)}</h2>
         <div class="meta">人均 ¥${escapeHtml(f.avg_price)}</div>
-        <img src="${escapeHtml(f.image_url || "")}" onerror="this.style.display='none'" alt="${escapeHtml(f.name)}">
+        ${f.image_url ? `<img src="${escapeHtml(f.image_url)}" onerror="this.style.display='none'" alt="${escapeHtml(f.name)}">` : ""}
         <p>${escapeHtml(f.description)}</p>
         <div class="stores"><strong>推荐门店：</strong><ul>${f.stores.map((s) => `<li>${escapeHtml(s.name)}${s.address ? "（" + escapeHtml(s.address) + "）" : ""}</li>`).join("") || "<li>暂无</li>"}</ul></div>
         <div class="actions">

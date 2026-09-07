@@ -32,7 +32,7 @@ const AttractionView = {
     }
     grid.innerHTML = data.items.map((a) => `
       <div class="card">
-        <img src="${escapeHtml(a.image_url || "")}" onerror="this.style.display='none'" alt="${escapeHtml(a.name)}">
+        ${a.image_url ? `<img src="${escapeHtml(a.image_url)}" onerror="this.style.display='none'" alt="${escapeHtml(a.name)}">` : ""}
         <div class="card-body">
           <h3>${escapeHtml(a.name)}</h3>
           <div class="meta">${escapeHtml(a.ticket_price)} · ${escapeHtml(a.open_time)}</div>
@@ -63,7 +63,7 @@ const AttractionView = {
       <div class="detail">
         <h2>${escapeHtml(a.name)}</h2>
         <div class="meta">开放时间 ${escapeHtml(a.open_time)} · 门票 ${escapeHtml(a.ticket_price)}</div>
-        <img src="${escapeHtml(a.image_url || "")}" onerror="this.style.display='none'" alt="${escapeHtml(a.name)}">
+        ${a.image_url ? `<img src="${escapeHtml(a.image_url)}" onerror="this.style.display='none'" alt="${escapeHtml(a.name)}">` : ""}
         <p>${escapeHtml(a.description)}</p>
         <div class="actions">
           <button class="btn ${FavoriteView.isFaved("attraction", a.id) ? "faved" : ""}" id="fav-btn">${FavoriteView.isFaved("attraction", a.id) ? "已收藏" : "收藏"}</button>
