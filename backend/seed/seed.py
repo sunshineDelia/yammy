@@ -47,6 +47,7 @@ SPECIFIC_IMG = {
     "南丰蜜桔": "nanfeng_miju", "猕猴桃": "mihoutao", "板鸭": "banya", "香肠": "xiangchang",
     "米粉蒸肉": "mifen_zhengrou", "炒河粉": "chaohefen", "牛骨粉": "niugufen",
     "芋饺": "yujiao", "豆渣饼": "douzhabing",
+    "武宁棍子鱼": "wuning_gunziyu", "庐山云雾茶": "lushan_yunwucha", "永修柘林湖鱼": "yongxiu_zhelin_yu",
 }
 
 # (name, description, avg_price, category, rating, rating_count, tags, address, image_url, stores)
