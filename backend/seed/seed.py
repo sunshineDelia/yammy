@@ -29,6 +29,26 @@ CATEGORY_IMG = {
     "特产": "/static/images/foods/gen_food_9.jpg",   # 水果
 }
 
+# 各美食的专属实拍图（slug），缺失的 4 道退回分类图
+SPECIFIC_IMG = {
+    "南昌炒粉": "nanchang_chaofen", "糊羹": "hugeng", "麻糍": "maci", "米粑": "miba",
+    "炒螺丝": "chaoluosi", "余干辣椒炒肉": "yugan_lajiao_chaorou", "莲花血鸭": "lianhua_xueya",
+    "井冈山烟笋": "jinggangshan_yansun", "庐山石鸡": "lushan_shiji", "粉蒸肉": "fenzhengrou",
+    "鄱阳湖胖鱼头": "poyanghu_yutou", "肉饼汤": "roubingtang", "墨鱼汤": "moyutang",
+    "排骨汤": "paigutang", "老鸭汤": "laoyatang", "三杯鸡": "sanbeiji",
+    "赣南小炒鱼": "gannan_xiaochaoyu", "兴国鱼丝": "xingguo_yusi", "赣州酿豆腐": "ganzhou_niangdoufu",
+    "萍乡炒粉": "pingxiang_chaofen", "九江茶饼": "jiujiang_chabing", "修水哨子": "xiushui_shaozi",
+    "南昌卤味": "nanchang_luwei", "卤鸭脖": "lu_yabo", "酱鸭": "jiangya",
+    "南昌烧烤": "nanchang_shaokao", "烤鱼": "kaoyu", "麻辣烫": "malatang",
+    "油炸臭豆腐": "youzha_choudoufu", "生煎包": "shengjianbao", "锅贴": "guotie",
+    "小笼包": "xiaolongbao", "南昌炒面": "nanchang_chaomian", "阳春面": "yangchunmian",
+    "馄饨": "huntun", "汤圆": "tangyuan", "米酒": "mijiu", "擂茶": "leicha",
+    "菊花茶": "juhuacha", "宁红茶": "ninghongcha", "赣南脐橙": "gannan_qicheng",
+    "南丰蜜桔": "nanfeng_miju", "猕猴桃": "mihoutao", "板鸭": "banya", "香肠": "xiangchang",
+    "米粉蒸肉": "mifen_zhengrou", "炒河粉": "chaohefen", "牛骨粉": "niugufen",
+    "芋饺": "yujiao", "豆渣饼": "douzhabing",
+}
+
 # (name, description, avg_price, category, rating, rating_count, tags, address, image_url, stores)
 FOODS = [
     ("南昌拌粉", "南昌最具代表性的小吃，米粉爽滑筋道，配花生米、萝卜干、辣椒油拌匀，酸辣开胃。", 12.0, "米粉", 4.9, 5231, ["必吃", "老字号", "香辣"], "中山路商圈", "/static/images/foods/nanchang_banfen.jpg", [("黄记瓦罐拌粉", "中山路"), ("老南昌拌粉店", "胜利路")]),
@@ -170,7 +190,8 @@ def seed() -> None:
 
         foods = []
         for (name, desc, price, cat, rating, rc, tags, addr, img, stores) in FOODS:
-            image_url = img or CATEGORY_IMG.get(cat, "/static/images/foods/gen_food_1.jpg")
+            specific = f"/static/images/foods/{SPECIFIC_IMG[name]}.jpg" if name in SPECIFIC_IMG else None
+            image_url = img or specific or CATEGORY_IMG.get(cat, "/static/images/foods/gen_food_1.jpg")
             foods.append(Food(
                 name=name, description=desc, avg_price=price, rating=rating,
                 rating_count=rc, category=cat, tags=tags, address=addr,
